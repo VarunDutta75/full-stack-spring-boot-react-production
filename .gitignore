@@ -33,3 +33,7 @@ build/
 .vscode/
 node_modules
 src/frontend/node/
+# Environment secrets
+.env
+.env.*
+!.env.example
