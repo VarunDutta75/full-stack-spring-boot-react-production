@@ -20,7 +20,7 @@ jobs:
         env:
           POSTGRES_DB: medinardb
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
         options: >-
@@ -30,7 +30,7 @@ jobs:
           --health-retries 10
 
     env:
-      DB_PASSWORD: postgres
+      DB_PASSWORD: password
 
     steps:
       - name: Checkout source code
