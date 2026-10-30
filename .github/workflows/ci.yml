@@ -2,16 +2,17 @@ name: Student App CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-  permissions:
-    contents: read
-    package: write
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
 
     services:
       postgres:
@@ -19,7 +20,7 @@ jobs:
         env:
           POSTGRES_DB: medinardb
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
@@ -29,7 +30,7 @@ jobs:
           --health-retries 10
 
     env:
-      DB_PASSWORD: password
+      DB_PASSWORD: postgres
 
     steps:
       - name: Checkout source code
@@ -39,15 +40,17 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: temurin
 
-      - - name: Build with Maven
+      - name: Build and test with Maven
         run: ./mvnw clean verify
 
       - name: Set up Docker Buildx
+        if: github.event_name == 'push'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GHCR
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -55,6 +58,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: .
